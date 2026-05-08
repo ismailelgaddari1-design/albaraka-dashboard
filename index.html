@@ -724,13 +724,22 @@ async function syncNow() {
     const orders = rows.map((row, i) => {
       const c = row.c || [];
       const g = n => c[n] && c[n].v != null ? String(c[n].v).trim() : '';
+      // A=First Name, B=Phone, C=Country, D=City, E=Address, F=ZIP, G=Product, H=Qty, I=Price, J=Date
+      const countryRaw = g(2);
+      const pays = countryRaw.toLowerCase().includes('fran') ? 'FR' :
+                   countryRaw.toLowerCase().includes('spain') || countryRaw.toLowerCase().includes('espagne') || countryRaw.toLowerCase().includes('espa') ? 'ES' :
+                   countryRaw.toLowerCase().includes('ital') ? 'IT' :
+                   countryRaw.toLowerCase().includes('german') || countryRaw.toLowerCase().includes('allem') ? 'DE' :
+                   countryRaw.toLowerCase().includes('nether') || countryRaw.toLowerCase().includes('pays-bas') ? 'NL' :
+                   countryRaw.toLowerCase().includes('belgi') ? 'BE' :
+                   countryRaw.toUpperCase().substring(0,2) || 'EU';
       return {
-        id: g(0) || 'EU-'+(1000+i),
-        prenom: g(1), nom: g(2), tel: g(3),
-        pays: (g(4)||'').toUpperCase().substring(0,2),
-        ville: g(5), adresse: g(6), cp: g(7), email: g(8),
-        produit: g(9), qty: g(10),
-        prix: g(11), date: g(12), statut: g(13)||'pending'
+        id: 'EU-'+(1000+i),
+        prenom: g(0), nom: '', tel: g(1),
+        pays: pays, pays_full: countryRaw,
+        ville: g(3), adresse: g(4), cp: g(5), email: '',
+        produit: g(6), qty: g(7),
+        prix: g(8) ? g(8)+'€' : '—', date: g(9), statut: 'pending'
       };
     }).filter(o => o.prenom || o.nom);
 
